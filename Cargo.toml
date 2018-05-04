@@ -2,6 +2,8 @@
 authors = ["Niko Matsakis <niko@alum.mit.edu>"]
 name = "rustc-seme-regions"
 version = "0.1.0"
+description = "Implementation of RFC 396"
+license = "Apache-2.0/MIT"
 
 [dev-dependencies]
 petgraph = "0.4.12"
