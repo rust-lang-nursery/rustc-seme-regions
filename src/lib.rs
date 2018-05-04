@@ -26,6 +26,7 @@ mod test;
 ///
 /// - For each node N in the region where N != H, all predecessors of
 ///   N are in the region.
+#[derive(Clone, Debug)]
 pub struct SemeRegion<P: Point> {
     head: P,
     tails: Vec<P>,
@@ -120,6 +121,17 @@ impl<P: Point> SemeRegion<P> {
         // (which is M), so we can invoke `add_point_dominated_by_head`
 
         self.add_point_dominated_by_head(graph, point);
+    }
+
+    pub fn add_region(&mut self, graph: impl GraphRef<P>, region: &SemeRegion<P>) {
+        if region.is_empty() {
+            return;
+        }
+
+        self.add_point(graph, region.head);
+        for &tail in &region.tails {
+            self.add_point(graph, tail)
+        }
     }
 
     /// Add `point` to the region in the case where we know that
