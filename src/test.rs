@@ -157,18 +157,19 @@ fn union_diamond() {
 
     // [0, 1]
     let mut r1 = SemeRegion::empty();
-    r1.add_point(g, NodeIndex::new(0));
-    r1.add_point(g, NodeIndex::new(2));
+    assert!(r1.add_point(g, NodeIndex::new(0)));
+    assert!(r1.add_point(g, NodeIndex::new(2)));
     assert_contents!(r1, g, +[0, 2] -[1, 3]);
 
     // [0, 2]
     let mut r2 = SemeRegion::empty();
-    r2.add_point(g, NodeIndex::new(0));
-    r2.add_point(g, NodeIndex::new(1));
+    assert!(r2.add_point(g, NodeIndex::new(0)));
+    assert!(r2.add_point(g, NodeIndex::new(1)));
     assert_contents!(r2, g, +[0, 1] -[2, 3]);
 
     // r1 + r2 == [0, 1, 2]
     let mut r3 = r1.clone();
-    r3.add_region(g, &r2);
+    assert!(r3.add_region(g, &r2));
+    assert!(!r3.add_region(g, &r2));
     assert_contents!(r3, g, +[0, 1, 2] -[3]);
 }

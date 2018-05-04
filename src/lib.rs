@@ -73,12 +73,15 @@ impl<P: Point> SemeRegion<P> {
         self.tails.iter().any(|&tail| graph.dominates(point, tail))
     }
 
-    pub fn add_point(&mut self, graph: impl GraphRef<P>, point: P) {
+    /// Adds the point `point` into `self`.
+    ///
+    /// True if the value of `self` changed, false if `point` was already in `self.
+    pub fn add_point(&mut self, graph: impl GraphRef<P>, point: P) -> bool {
         if self.tails.is_empty() {
             // Region is empty; create singleton region.
             self.head = point;
             self.tails.push(point);
-            return;
+            return true;
         }
 
         if graph.dominates(self.head, point) {
@@ -121,23 +124,30 @@ impl<P: Point> SemeRegion<P> {
         // (which is M), so we can invoke `add_point_dominated_by_head`
 
         self.add_point_dominated_by_head(graph, point);
+        return true; // we changed the head, so something changed
     }
 
-    pub fn add_region(&mut self, graph: impl GraphRef<P>, region: &SemeRegion<P>) {
+    /// Adds all points in `region` into `self`.
+    ///
+    /// True if the value of `self` changed, false if `point` was already in `self.
+    pub fn add_region(&mut self, graph: impl GraphRef<P>, region: &SemeRegion<P>) -> bool {
         if region.is_empty() {
-            return;
+            return false;
         }
 
-        self.add_point(graph, region.head);
+        let mut changed = self.add_point(graph, region.head);
         for &tail in &region.tails {
-            self.add_point(graph, tail)
+            changed = changed | self.add_point(graph, tail);
         }
+        changed
     }
 
     /// Add `point` to the region in the case where we know that
     /// `point` is dominated by `self.head`. (See comment in the
     /// function for detailed breakdown).
-    fn add_point_dominated_by_head(&mut self, graph: impl GraphRef<P>, point: P) {
+    ///
+    /// True if the value of `self` changed, false if `point` was already in `self.
+    fn add_point_dominated_by_head(&mut self, graph: impl GraphRef<P>, point: P) -> bool {
         debug_assert!(graph.dominates(self.head, point));
 
         // We now want to distinguish one of a few cases:
@@ -190,11 +200,12 @@ impl<P: Point> SemeRegion<P> {
                 // -- unless `p == point`, in which case the point is
                 // already contained in the set.
                 if p == point {
-                    return;
+                    return false;
                 }
 
                 self.tails[index] = point;
-                return self.ensure_continuity(graph, p, point);
+                self.ensure_continuity(graph, p, point);
+                return true;
             }
 
             if p == self.head {
@@ -209,16 +220,17 @@ impl<P: Point> SemeRegion<P> {
     /// dominated by any of the tails. This means that either P is
     /// within the region (if it dominates a tail) or else it is a new
     /// "branch".
-    fn add_point_dominated_by_head_and_not_by_tail(&mut self, graph: impl GraphRef<P>, point: P) {
+    fn add_point_dominated_by_head_and_not_by_tail(&mut self, graph: impl GraphRef<P>, point: P) -> bool {
         if self.dominates_any_tail(graph, point) {
             // already contained, the "noop" case above.
-            return;
+            return false;
         }
 
         // "extension" case.
         self.tails.push(point);
         let head = self.head;
         self.ensure_continuity(graph, head, point);
+        true
     }
 
     /// Ensures that, for any node P that lies between `parent`
