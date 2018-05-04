@@ -1,3 +1,8 @@
+#![feature(crate_in_paths)]
+#![feature(extern_absolute_paths)]
+#![feature(extern_prelude)]
+#![feature(in_band_lifetimes)]
+
 use std::fmt::Debug;
 
 mod test;
@@ -36,7 +41,7 @@ pub trait GraphRef<P: Point>: Copy {
 
     /// Returns the immediate dominator of `point` -- if `point` is
     /// the entry to the graph, then returns `point`.
-    fn immediate_dominator(self, point: P) -> P;
+    fn immediate_dominator(self, point: P) -> Option<P>;
 
     /// True if point1 dominates point2.
     fn dominates(self, point1: P, point2: P) -> bool;
@@ -184,7 +189,7 @@ impl<P: Point> SemeRegion<P> {
                 return self.add_point_dominated_by_head_and_not_by_tail(graph, point);
             }
 
-            p = graph.immediate_dominator(p);
+            p = graph.immediate_dominator(p).unwrap();
         }
     }
 
@@ -225,7 +230,7 @@ impl<P: Point> SemeRegion<P> {
                 self.add_point(graph, predecessor);
             }
 
-            point = graph.immediate_dominator(point);
+            point = graph.immediate_dominator(point).unwrap();
         }
     }
 }
