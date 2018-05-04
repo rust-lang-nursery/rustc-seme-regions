@@ -1,6 +1,6 @@
 [package]
 authors = ["Niko Matsakis <niko@alum.mit.edu>"]
-name = "seme"
+name = "rustc-seme-regions"
 version = "0.1.0"
 
 [dev-dependencies]
