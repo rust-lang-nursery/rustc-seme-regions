@@ -37,7 +37,7 @@ pub trait Point: Copy + Ord + Debug {
 }
 
 pub trait GraphRef<P: Point>: Copy {
-    type Predecessors: Iterator<Item = P>;
+    type Predecessors: IntoIterator<Item = P>;
     fn predecessors(self, point: P) -> Self::Predecessors;
 
     /// Returns the immediate dominator of `point` -- if `point` is
