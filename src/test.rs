@@ -50,13 +50,6 @@ impl GraphRef<NodeIndex> for &'g GraphPair {
     fn immediate_dominator(self, point: NodeIndex) -> Option<NodeIndex> {
         self.dominators.immediate_dominator(point)
     }
-
-    fn dominates(self, point1: NodeIndex, point2: NodeIndex) -> bool {
-        self.dominators
-            .dominators(point2)
-            .unwrap()
-            .any(|p| p == point1)
-    }
 }
 
 macro_rules! assert_contents {
