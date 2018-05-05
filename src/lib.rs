@@ -41,13 +41,29 @@ pub trait GraphRef<P: Point>: Copy {
     fn predecessors(self, point: P) -> Self::Predecessors;
 
     /// Returns the immediate dominator of `point` -- if `point` is
-    /// the entry to the graph, then returns `point`.
+    /// the entry to the graph, then returns `None`.
     fn immediate_dominator(self, point: P) -> Option<P>;
 
     /// True if point1 dominates point2.
     fn dominates(self, point1: P, point2: P) -> bool;
 
-    fn mutual_dominator(self, point1: P, point2: P) -> P;
+    /// Returns the "innermost" point that dominates `point1` and `point2`.
+    ///
+    /// The default impl simply walks up the dominator tree using
+    /// `immediate_dominator` -- you can likely provide a more
+    /// efficient implementation.
+    fn mutual_dominator(self, point1: P, point2: P) -> P {
+        let mut p = point2;
+        loop {
+            // invariant: p dominates point2
+
+            if self.dominates(p, point1) {
+                return p;
+            }
+
+            p = self.immediate_dominator(p).unwrap();
+        }
+    }
 }
 
 impl<P: Point> SemeRegion<P> {

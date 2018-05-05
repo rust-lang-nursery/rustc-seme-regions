@@ -57,16 +57,6 @@ impl GraphRef<NodeIndex> for &'g GraphPair {
             .unwrap()
             .any(|p| p == point1)
     }
-
-    fn mutual_dominator(self, point1: NodeIndex, point2: NodeIndex) -> NodeIndex {
-        for p in self.dominators.dominators(point2).unwrap() {
-            // invariant: p dominates point2
-            if self.dominates(p, point1) {
-                return p;
-            }
-        }
-        panic!("no mutual dominator of {:?} and {:?}", point1, point2)
-    }
 }
 
 macro_rules! assert_contents {
